@@ -20,6 +20,8 @@ for (const folder of commandFolders) {
     client.commands.set(command.name, command);
   }
 }
+client.cooldowns = new Map();
+
 
 client.once(Events.ClientReady, () => {
   console.log(chalk.green(`Logged in as ${client.user.tag}`));
@@ -27,6 +29,25 @@ client.once(Events.ClientReady, () => {
 
 client.on(Events.MessageCreate, message => {
   if (message.author.id !== client.user.id) return;
+const cooldownAmount = (command.cooldown || 0) * 1000;
+if (cooldownAmount) {
+  if (!client.cooldowns.has(cmdName)) client.cooldowns.set(cmdName, new Map());
+
+  const timestamps = client.cooldowns.get(cmdName);
+  const now = Date.now();
+  const expiration = timestamps.get(message.author.id) + cooldownAmount;
+
+  if (timestamps.has(message.author.id)) {
+    if (now < expiration) {
+      const left = ((expiration - now) / 1000).toFixed(1);
+      return message.channel.send(`Please wait ${left}s before reusing \`${cmdName}\`.`);
+    }
+  }
+
+  timestamps.set(message.author.id, now);
+  setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
+}
+
 
   // Message Logging
   console.log(`[${moment().format('HH:mm:ss')}] ${message.author.username}: ${message.content}`);
