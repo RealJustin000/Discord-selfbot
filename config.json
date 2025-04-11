@@ -1,0 +1,6 @@
+{
+  "token": "YOUR_USER_TOKEN_HERE",
+  "prefix": "!",
+  "autoReply": true,
+  "autoReplyMessage": "I'm currently busy. Will reply soon!"
+}
