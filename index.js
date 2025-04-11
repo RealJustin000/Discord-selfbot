@@ -47,7 +47,24 @@ if (cooldownAmount) {
   timestamps.set(message.author.id, now);
   setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
 }
+const logToFile = require('./logger');
+logToFile(message);
 
+const triggers = {
+  'hello': 'Hey there!',
+  'goodnight': 'Sweet dreams!',
+  'brb': 'Hurry back!'
+};
+
+for (let keyword in triggers) {
+  if (message.content.toLowerCase().includes(keyword)) {
+    return message.channel.send(triggers[keyword]);
+  }
+}
+if (message.channel.type === 1 && message.author.id !== client.user.id) { // DM
+  const log = `[DM] ${message.author.tag}: ${message.content}\n`;
+  fs.appendFileSync('dm_log.txt', log, 'utf8');
+}
 
   // Message Logging
   console.log(`[${moment().format('HH:mm:ss')}] ${message.author.username}: ${message.content}`);
